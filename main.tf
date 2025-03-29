@@ -114,7 +114,7 @@ module "private_instances" {
 }
 
 
-module "load_balancer" {
+module "Public_load_balancer" {
   source             = "./modules/load_balancer"
   is_internal        = false
   security_group_ids = [
@@ -127,7 +127,28 @@ module "load_balancer" {
   subnet_ids         = module.subnet.public_subnets
   vpc_id             = module.vpc.vpc_id
 
-  # Use only private instance IDs
+  instance_ids       = module.public_instances.public_instance_ids
+
+  depends_on = [
+    module.public_instances,
+    module.security_group,
+    module.route_table
+  ]
+}
+
+module "Private_load_balancer" {
+  source             = "./modules/load_balancer"
+  is_internal        = true
+  security_group_ids = [
+    module.security_group.bastion_security_group_id,
+    module.security_group.private_instance_security_group_id,
+    module.security_group.load_balancer_security_group_id
+  ]
+  resource_name      = var.project_name
+  load_balancer_name = "${var.project_name}-lb"
+  subnet_ids         = module.subnet.private_subnets
+  vpc_id             = module.vpc.vpc_id
+
   instance_ids       = module.private_instances.private_instance_ids
 
   depends_on = [

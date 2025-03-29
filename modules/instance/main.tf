@@ -16,20 +16,7 @@ resource "aws_instance" "bastion" {
     Name = "${var.resource_name}-bastion-${count.index}"
   }
   
-  # Remote provisioner: install Apache (or a proxy)
-  provisioner "remote-exec" {
-    inline = [
-      "sudo apt-get update -y",
-      "sudo apt-get install -y apache2"
-    ]
-    connection {
-      type        = "ssh"
-      user        = "ubuntu"
-      private_key = file(var.key)
-      host        = self.public_ip
-    }
-  }
-}
+ 
 
 resource "aws_instance" "private" {
   count = var.private_instance_count > 0 ? var.private_instance_count : 0
@@ -73,6 +60,23 @@ resource "null_resource" "public_instance_provisioners" {
       "chmod 400 /home/ubuntu/my-key-pair.pem"
     ]
   }
+  provisioner "remote-exec" {
+    inline = [
+      "sudo apt-get update -y",
+      "sudo apt-get install -y apache2"
+    ]
+    connection {
+      type        = "ssh"
+      user        = "ubuntu"
+      private_key = file(var.key)
+      host        = self.public_ip
+    }
+  }
+}
+  provisioner "file" {
+    source      = "../web_page"
+    destination = "/var/www/html/"
+  }
 
   depends_on = [aws_instance.bastion]
 }
@@ -81,8 +85,8 @@ resource "null_resource" "print_ips" {
   depends_on = [aws_instance.bastion]
 
   provisioner "local-exec" {
-    # This command uses Terraform's interpolation to join the bastion public IPs,
-    # then writes them to all-ips.txt with the desired format.
-    command = "echo '${join(\"\\n\", [for idx, ip in aws_instance.bastion[*].public_ip : format(\"public-ip%d %s\", idx+1, ip)])}' > all-ips.txt"
+    command = <<-EOT
+      echo "${join("\n", [for i, ip in aws_instance.bastion[*].public_ip : "public-ip${i + 1} ${ip}"])}" > all-ips.txt
+    EOT
   }
 }
