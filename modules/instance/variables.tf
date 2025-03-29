@@ -23,6 +23,7 @@ variable "user_data" {
 variable "ami_id" {
   description = "The AMI ID to use for the instances."
   type        = string
+  default = "module.ubuntu_data_source.ami_id"
 }
 
 variable "instance_type" {
