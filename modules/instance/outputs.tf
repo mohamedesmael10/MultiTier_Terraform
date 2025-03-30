@@ -1,4 +1,4 @@
-output "bastion_instance_ids" {
+output "public_instance_ids" {
   value = aws_instance.bastion[*].id
 }
 

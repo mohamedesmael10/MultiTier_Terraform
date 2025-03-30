@@ -1,5 +1,5 @@
-vpc_cidr             = "10.0.0.0/16"
-project_name         = "EsmaelTerraform"
+vpc_cidr     = "10.0.0.0/16"
+project_name = "EsmaelTF"
 
 subnet_configs = {
   "public_subnet_1" = {
@@ -24,9 +24,9 @@ subnet_configs = {
   }
 }
 
-ami_id               = "module.ubuntu_data_source.ami_id"  # Replace with your actual AMI ID
-instance_type        = "t2.micro"
-key_name             = "my-key-pair"                 # Replace with your actual key name
+#ami_id        = module.data_source.ami_id # Replace with your actual AMI ID
+instance_type = "t2.micro"
+key_name      = "my-key-pair" # Replace with your actual key name
 
 bastion_instance_count = 2
 private_instance_count = 2
@@ -41,8 +41,19 @@ user_data = <<-EOF
             sudo service nginx restart 
             EOF
 */
-nat_gateway_name        = "EsmaelTerraform-nat-gw"
-public_subnet_id_input  = module.subnet.public_subnets[0]  # Ensure this is correctly output from subnet module
-key_pair_name           = "my-key-pair"
-encryption_algorithm    = "RSA"
-encryption_key_bits     = 4096
+nat_gateway_name       = "EsmaelTerraform-nat-gw"
+public_subnet_id_input = module.subnet.public_subnets[0] # Ensure this is correctly output from subnet module
+key_pair_name          = "my-key-pair"
+encryption_algorithm   = "RSA"
+encryption_key_bits    = 4096
+
+
+
+most_recent = true
+
+owners = ["099720109477"]
+
+ami_filter = {
+  name   = "name"
+  values = ["ubuntu/images/hvm-ssd/ubuntu-jammy-22.04-amd64-server-*"]
+}

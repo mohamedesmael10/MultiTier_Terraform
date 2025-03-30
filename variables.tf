@@ -14,16 +14,17 @@ variable "subnet_configs" {
   description = "A map of subnet configurations."
   type = map(object({
     cidr_block        = string
-    availability_zone       = string
-    assign_public_ip  = optional(bool, false)  # Add the optional public IP field with a default value
+    availability_zone = string
+    assign_public_ip  = optional(bool, false) # Add the optional public IP field with a default value
   }))
 }
 
-
+/*
 variable "ami_id" {
   description = "The AMI ID to use for the instances."
   type        = string
 }
+*/
 
 variable "instance_type" {
   description = "The type of instances to launch."
@@ -34,7 +35,7 @@ variable "key_name" {
   description = "The name of the key pair to use."
   type        = string
 }
-
+/*
 variable "user_data" {
   description = "Script to install application."
   type        = string
@@ -48,11 +49,11 @@ variable "user_data" {
                   sudo service nginx restart
                 EOF
 }
-
+*/
 variable "bastion_instance_count" {
   description = "The number of bastion instances to create."
   type        = number
-  default     = 1  # You can adjust this as needed
+  default     = 1 # You can adjust this as needed
 }
 
 variable "encryption_key_bits" {
@@ -63,7 +64,7 @@ variable "encryption_key_bits" {
 variable "private_instance_count" {
   description = "The number of private instances to create."
   type        = number
-  default     = 2  # Set a default value if applicable
+  default     = 2 # Set a default value if applicable
 }
 
 variable "nat_gateway_name" {
@@ -74,9 +75,29 @@ variable "nat_gateway_name" {
 variable "encryption_algorithm" {
   description = "The encryption algorithm to use."
   type        = string
-  default     = "RSA"  # You can set a default value if applicable
+  default     = "RSA" # You can set a default value if applicable
 }
 variable "key_pair_name" {
   description = "The name of the key pair to use."
   type        = string
+}
+
+variable "most_recent" {
+  description = "Select the most recent AMI."
+  type        = bool
+  default     = true
+}
+
+variable "owners" {
+  description = "List of AMI owner IDs."
+  type        = list(string)
+  default     = ["099720109477"]
+}
+
+variable "ami_filter" {
+  description = "Filter object for the AMI lookup. Requires 'name' and 'values'."
+  type = object({
+    name   = string,
+    values = list(string)
+  })
 }
