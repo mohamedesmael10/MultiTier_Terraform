@@ -1,9 +1,9 @@
 variable "nat_gateway_name" {
-  description = "The name for the NAT Gateway"
+  description = "Name for the NAT gateway(s)."
   type        = string
 }
 
-variable "public_subnet_id_input" {
-  description = "The ID of the public subnet where the NAT Gateway will be deployed"
-  type        = string
+variable "public_subnet_ids" {
+  description = "List of public subnet IDs in which to create NAT gateways."
+  type        = list(string)
 }

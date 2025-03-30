@@ -1,3 +1,4 @@
+# Public (Bastion) Instances – created only when bastion_instance_count > 0
 resource "aws_instance" "bastion" {
   count                       = var.bastion_instance_count > 0 ? var.bastion_instance_count : 0
   ami                         = var.ami_id
@@ -12,6 +13,7 @@ resource "aws_instance" "bastion" {
   }
 }
 
+# Private Instances – created only when private_instance_count > 0
 resource "aws_instance" "private" {
   count                       = var.private_instance_count > 0 ? var.private_instance_count : 0
   ami                         = var.ami_id
@@ -27,10 +29,13 @@ resource "aws_instance" "private" {
   }
 }
 
-resource "null_resource" "public_instance_provisioners" {
+#############################
+# Provisioning for Bastion (Public) Instances
+#############################
+resource "null_resource" "bastion_provisioners" {
   count = var.bastion_instance_count > 0 ? var.bastion_instance_count : 0
 
-  # Provisioner 1: Copy a key file to the remote bastion instance
+  # Copy a key file to the bastion
   provisioner "file" {
     connection {
       type        = "ssh"
@@ -42,7 +47,7 @@ resource "null_resource" "public_instance_provisioners" {
     destination = "/home/ubuntu/my-key-pair.pem"
   }
 
-  # Provisioner 2: Change file permissions on the remote host
+  # Change key file permissions on the bastion
   provisioner "remote-exec" {
     connection {
       type        = "ssh"
@@ -55,7 +60,7 @@ resource "null_resource" "public_instance_provisioners" {
     ]
   }
 
-  # Provisioner 3: Update and install Apache on the remote bastion instance
+  # Update and install Apache on the bastion
   provisioner "remote-exec" {
     connection {
       type        = "ssh"
@@ -73,27 +78,53 @@ resource "null_resource" "public_instance_provisioners" {
     ]
   }
 
-  # Provisioner 4: Copy the entire local web_page directory to /var/www/html/ on the remote host
+  depends_on = [aws_instance.bastion]
+}
+
+#############################
+# Provisioning for Private Instances
+# Uses a jump host specified via var.bastion_host_ip.
+#############################
+resource "null_resource" "private_provisioners" {
+  count = var.private_instance_count > 0 ? var.private_instance_count : 0
+
+  # Update and install Apache on the private instance using the bastion as jump host
+  provisioner "remote-exec" {
+    connection {
+      type                = "ssh"
+      user                = "ubuntu"
+      private_key         = file(var.key)
+      host                = aws_instance.private[count.index].private_ip
+      bastion_host        = var.bastion_host_ip
+      bastion_user        = "ubuntu"
+      bastion_private_key = file(var.key)
+    }
+    inline = [
+      "sudo apt-get update -y",
+      "sudo apt-get install -y apache2",
+      "sudo systemctl start apache2",
+      "sudo systemctl enable apache2",
+      "sudo chown -R ubuntu:ubuntu /var/www/html",
+      "sudo systemctl restart apache2"
+    ]
+  }
+
+  # Copy the local web_page directory to /var/www/html on the private instance using the bastion as jump host
   provisioner "file" {
     connection {
-      type        = "ssh"
-      user        = "ubuntu"
-      private_key = file(var.key)
-      host        = aws_instance.bastion[count.index].public_ip
+      type                = "ssh"
+      user                = "ubuntu"
+      private_key         = file(var.key)
+      host                = aws_instance.private[count.index].private_ip
+      bastion_host        = var.bastion_host_ip
+      bastion_user        = "ubuntu"
+      bastion_private_key = file(var.key)
     }
     source      = "./web_page"
     destination = "/var/www/html"
   }
 
-  depends_on = [aws_instance.bastion]
+  depends_on = [aws_instance.private]
 }
 
-resource "null_resource" "print_ips" {
-  depends_on = [aws_instance.bastion]
 
-  provisioner "local-exec" {
-    command = <<-EOT
-      echo "${join("\n", [for i, ip in aws_instance.bastion[*].public_ip : "public-ip${i + 1} ${ip}"])}" > all-ips.txt
-    EOT
-  }
-}

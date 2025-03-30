@@ -67,3 +67,9 @@ variable "associate_public_ip_address" {
   type        = bool
   default     = false  
 }
+
+variable "bastion_host_ip" {
+  description = "Public IP address of the bastion host to use as a jump host for private instance provisioning."
+  type        = string
+  default     = ""  # This must be provided when private_instance_count > 0
+}

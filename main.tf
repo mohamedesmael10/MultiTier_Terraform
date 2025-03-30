@@ -21,17 +21,18 @@ module "internet_gateway" {
 }
 
 module "nat_gateway" {
-  source                 = "./modules/nat_gateway"
-  nat_gateway_name       = "${var.project_name}-nat-gw"
-  public_subnet_id_input = module.subnet.public_subnets[0]
+  source            = "./modules/nat_gateway"
+  nat_gateway_name  = "${var.project_name}-nat-gw"
+  public_subnet_ids = module.subnet.public_subnets
 
   depends_on = [module.subnet, module.internet_gateway]
 }
+
 module "route_table" {
   source                    = "./modules/route_table"
   vpc_id_input              = module.vpc.vpc_id
   internet_gateway_id_input = module.internet_gateway.internet_gateway_id
-  nat_gateway_id_input      = module.nat_gateway.nat_gateway_id
+  nat_gateway_ids           = module.nat_gateway.nat_gateway_ids
   public_subnet_ids         = module.subnet.public_subnets
   private_subnet_ids        = module.subnet.private_subnets
   route_table_name          = "${var.project_name}-route-table"
@@ -78,7 +79,7 @@ module "public_instances" {
     load_balancer = module.security_group.load_balancer_security_group_id
   }
   key_name = var.key_pair_name
-
+  bastion_host_ip = ""
   # Ensure public instances are created after the subnets, security groups, and route table
   depends_on = [
     module.subnet,
@@ -111,7 +112,7 @@ module "private_instances" {
   }
   key_name = var.key_pair_name
   #user_data                  = var.user_data
-
+  bastion_host_ip = module.public_instances.public_instance_ips[0]
   # Ensure private instances are created after the subnets, security groups, NAT gateway, and route table
   depends_on = [
     module.subnet,
@@ -153,7 +154,7 @@ module "Private_load_balancer" {
     module.security_group.load_balancer_security_group_id
   ]
   resource_name      = var.project_name
-  load_balancer_name = "${var.project_name}-Private-lb"
+  load_balancer_name = "${var.project_name}-lb"
   subnet_ids         = module.subnet.private_subnets
   vpc_id             = module.vpc.vpc_id
 
