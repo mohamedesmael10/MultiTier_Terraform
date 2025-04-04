@@ -78,21 +78,22 @@ module "public_instances" {
     private       = module.security_group.private_instance_security_group_id
     load_balancer = module.security_group.load_balancer_security_group_id
   }
-  key_name = var.key_pair_name
+  key_name        = var.key_pair_name
   bastion_host_ip = ""
   # Ensure public instances are created after the subnets, security groups, and route table
   depends_on = [
     module.subnet,
     module.security_group,
     module.route_table,
-    module.data_source
+    module.data_source,
+    module.security_group
   ]
 }
 module "data_source" {
   source      = "./modules/data_source"
   most_recent = var.most_recent
   owners      = var.owners
-  ami_filter     = var.ami_filter
+  ami_filter  = var.ami_filter
 }
 
 module "private_instances" {
@@ -118,7 +119,8 @@ module "private_instances" {
     module.subnet,
     module.nat_gateway,
     module.route_table,
-    module.data_source
+    module.data_source,
+    module.security_group
   ]
 }
 

@@ -22,7 +22,7 @@ resource "aws_instance" "private" {
   key_name                    = var.key_name
   associate_public_ip_address = false
   security_groups             = [var.security_group_ids.private]
-  user_data                   = var.user_data
+  #user_data                   = var.user_data
 
   tags = {
     Name = "${var.resource_name}-private-${count.index}"
@@ -56,7 +56,7 @@ resource "null_resource" "bastion_provisioners" {
       host        = aws_instance.bastion[count.index].public_ip
     }
     inline = [
-      "chmod 400 /home/ubuntu/my-key-pair.pem"
+      "chmod 600 /home/ubuntu/my-key-pair.pem"
     ]
   }
 
@@ -100,13 +100,19 @@ resource "null_resource" "private_provisioners" {
       bastion_private_key = file(var.key)
     }
     inline = [
-      "sudo apt-get update -y",
-      "sudo apt-get install -y apache2",
-      "sudo systemctl start apache2",
-      "sudo systemctl enable apache2",
-      "sudo chown -R ubuntu:ubuntu /var/www/html",
-      "sudo systemctl restart apache2"
-    ]
+    "set -e",  // Exit immediately if a command exits with a non-zero status
+    "echo 'Updating apt-get...'",
+    "sudo apt-get update -y",
+    "echo 'Installing apache2...'",
+    "sudo apt-get install -y apache2",
+    "echo 'Starting apache2...'",
+    "sudo systemctl start apache2",
+    "sudo systemctl enable apache2",
+    "sudo mkdir -p /var/www/html",
+    "sudo chown -R ubuntu:ubuntu /var/www/html",
+    "sudo systemctl restart apache2",
+    "echo 'Apache installation complete.'"
+  ]
   }
 
   # Copy the local web_page directory to /var/www/html on the private instance using the bastion as jump host
@@ -120,11 +126,11 @@ resource "null_resource" "private_provisioners" {
       bastion_user        = "ubuntu"
       bastion_private_key = file(var.key)
     }
-    source      = "./web_page"
+    source      = "./web_page/"
     destination = "/var/www/html"
   }
 
-  depends_on = [aws_instance.private]
+  depends_on = [aws_instance.private, aws_instance.bastion]
 }
 
 
