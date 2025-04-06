@@ -102,6 +102,12 @@ This project establishes a secure and scalable cloud infrastructure on AWS using
    terraform apply
    ```
 
+## Cleanup
+To destroy all the resources created by Terraform:
+```bash
+terraform destroy -auto-approve
+```
+
 ## Shots
 
 Below are some key screenshots for this project:
@@ -142,15 +148,15 @@ Below are some key screenshots for this project:
 
 - **e. Additional Shots:**  
 
-![Shot5](https://github.com/mohamedesmael10/terraform-aws-project/raw/main/Screenshots/5.png)
+![Shot5](https://github.com/mohamedesmael10/MultiTier_Terraform/blob/main/Screenshots/5.png)
 
-![Shot7](https://github.com/mohamedesmael10/terraform-aws-project/raw/main/Screenshots/7.png)
+![Shot7](https://github.com/mohamedesmael10/MultiTier_Terraform/blob/main/Screenshots/7.png)
 
-![Shot8](https://github.com/mohamedesmael10/terraform-aws-project/raw/main/Screenshots/8.png)
+![Shot8](https://github.com/mohamedesmael10/MultiTier_Terraform/blob/main/Screenshots/8.png)
 
-![Shot9](https://github.com/mohamedesmael10/terraform-aws-project/raw/main/Screenshots/9.png)
+![Shot9](https://github.com/mohamedesmael10/MultiTier_Terraform/blob/main/Screenshots/9.png)
 
-![Shot11](https://github.com/mohamedesmael10/terraform-aws-project/raw/main/Screenshots/11.png)
+![Shot11](https://github.com/mohamedesmael10/MultiTier_Terraform/blob/main/Screenshots/11.png)
 
 
 
@@ -185,3 +191,7 @@ Below are some key screenshots for this project:
 This project demonstrates how to build a robust, secure, and scalable cloud infrastructure on AWS using Terraform. By utilizing custom modules for VPC, Subnet, Internet Gateway, NAT Gateway, Route Tables, Security Groups, EC2 Instances, Load Balancers, and more, it delivers a multi-tier environment that isolates sensitive components while providing necessary access via a Bastion Host and Load Balancer.
 
 Follow best practices for security, remote state management, and modular code organization to maintain and scale your infrastructure effectively.
+
+- **Mohamed Mostafa Esmael**  
+  Email: [mohamed.mostafa.esmael10@outlook.com](mailto:mohamed.mostafa.esmael10@outlook.com)  
+  LinkedIn: [linkedin.com/in/mohamedesmael](https://linkedin.com/in/mohamedesmael)
