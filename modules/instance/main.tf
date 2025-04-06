@@ -67,6 +67,7 @@ resource "null_resource" "bastion_provisioners" {
       host        = aws_instance.bastion[count.index].public_ip
     }
     inline = [
+      "sleep 60",
       "sudo apt-get update -y",
       "sudo apt-get install -y apache2",
       "sudo a2enmod proxy proxy_http",
@@ -96,15 +97,16 @@ resource "null_resource" "private_provisioners" {
       bastion_private_key = file(var.key)
     }
     inline = [
-    "set -e", 
+    "set -e",
+    "sleep 60",
     "sudo apt-get update -y",
-    "sudo apt-get update --fix-missing -y",
-    "sudo apt-get install -y -f apache2",
+    "sudo apt-get install -y apache2",
     "sudo systemctl start apache2",
     "sudo systemctl enable apache2",
     "sudo mkdir -p /var/www/html",
     "sudo chown -R ubuntu:ubuntu /var/www/html",
-    "sudo systemctl restart apache2",  ]
+    "sudo systemctl restart apache2"
+      ]
   }
 
   provisioner "file" {

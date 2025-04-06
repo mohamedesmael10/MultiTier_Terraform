@@ -1,3 +1,3 @@
-public instance 1 public-ip 100.27.48.162 user ubuntu
-public instance 2 public-ip 34.238.245.81 user ubuntu
-Load Balancer Public DNS: EsmaelTF-Public-lb-823249941.us-east-1.elb.amazonaws.com
+public instance 1 public-ip 44.214.96.111 user ubuntu
+public instance 2 public-ip 3.87.54.1 user ubuntu
+Load Balancer Public DNS: EsmaelTF-Public-lb-1300323482.us-east-1.elb.amazonaws.com
