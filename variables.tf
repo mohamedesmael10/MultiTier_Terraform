@@ -15,7 +15,7 @@ variable "subnet_configs" {
   type = map(object({
     cidr_block        = string
     availability_zone = string
-    assign_public_ip  = optional(bool, false) # Add the optional public IP field with a default value
+    assign_public_ip  = optional(bool, false) 
   }))
 }
 
@@ -53,7 +53,7 @@ variable "user_data" {
 variable "bastion_instance_count" {
   description = "The number of bastion instances to create."
   type        = number
-  default     = 1 # You can adjust this as needed
+  default     = 1 
 }
 
 variable "encryption_key_bits" {
@@ -64,7 +64,7 @@ variable "encryption_key_bits" {
 variable "private_instance_count" {
   description = "The number of private instances to create."
   type        = number
-  default     = 2 # Set a default value if applicable
+  default     = 2 
 }
 
 variable "nat_gateway_name" {
@@ -75,7 +75,7 @@ variable "nat_gateway_name" {
 variable "encryption_algorithm" {
   description = "The encryption algorithm to use."
   type        = string
-  default     = "RSA" # You can set a default value if applicable
+  default     = "RSA" 
 }
 variable "key_pair_name" {
   description = "The name of the key pair to use."
@@ -101,3 +101,9 @@ variable "ami_filter" {
     values = list(string)
   })
 }
+/*
+variable "internal_lb_dns" {
+  description = "DNS name of the internal load balancer"
+  type        = string
+}
+*/

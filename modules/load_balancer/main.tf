@@ -1,5 +1,4 @@
-# Create the load balancer
-resource "aws_lb" "application_lb" {
+resource "aws_lb" "this" {
   name               = var.load_balancer_name
   internal           = var.is_internal
   load_balancer_type = "application"
@@ -11,30 +10,27 @@ resource "aws_lb" "application_lb" {
   }
 }
 
-# Create a unique target group based on LB type
-resource "aws_lb_target_group" "application_tg" {
-  name     = "${var.resource_name}-tg-${var.is_internal ? "priv" : "pub"}"
+resource "aws_lb_target_group" "this" {
+  name     = substr("${var.resource_name}-${var.is_internal ? "priv-tg" : "pub-tg"}", 0, 32)
   port     = 80
   protocol = "HTTP"
   vpc_id   = var.vpc_id
 }
 
-# Create a listener that forwards traffic to the target group
-resource "aws_lb_listener" "http_listener" {
-  load_balancer_arn = aws_lb.application_lb.arn
+resource "aws_lb_listener" "this" {
+  load_balancer_arn = aws_lb.this.arn
   port              = 80
   protocol          = "HTTP"
 
   default_action {
     type             = "forward"
-    target_group_arn = aws_lb_target_group.application_tg.arn
+    target_group_arn = aws_lb_target_group.this.arn
   }
 }
 
-# Attach instances to the target group
-resource "aws_lb_target_group_attachment" "instance_attachment" {
+resource "aws_lb_target_group_attachment" "this" {
   count            = length(var.instance_ids)
-  target_group_arn = aws_lb_target_group.application_tg.arn
+  target_group_arn = aws_lb_target_group.this.arn
   target_id        = var.instance_ids[count.index]
   port             = 80
 }

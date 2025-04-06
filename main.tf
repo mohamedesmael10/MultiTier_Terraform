@@ -47,7 +47,7 @@ module "route_table" {
 
 module "keyPair" {
   source               = "./modules/key_pair"
-  key_pair_name        = "my-key-pair"
+  key_pair_name        = "my-key-pair.pem"
   encryption_algorithm = "RSA"
   encryption_key_bits  = 4096
 
@@ -68,7 +68,6 @@ module "public_instances" {
   private_instance_count = 0
   bastion_instance_count = var.bastion_instance_count
   #user_data              = var.user_data
-
   ami_id         = module.data_source.ami_id
   instance_type  = var.instance_type
   subnet_ids     = module.subnet.public_subnets # Change this line
@@ -101,7 +100,6 @@ module "private_instances" {
   resource_name          = var.project_name
   private_instance_count = var.private_instance_count
   bastion_instance_count = 0
-
   ami_id         = module.data_source.ami_id
   instance_type  = var.instance_type
   subnet_ids     = module.subnet.private_subnets # Change this line
@@ -117,10 +115,11 @@ module "private_instances" {
   # Ensure private instances are created after the subnets, security groups, NAT gateway, and route table
   depends_on = [
     module.subnet,
+    module.public_instances,
     module.nat_gateway,
     module.route_table,
     module.data_source,
-    module.security_group
+    module.security_group,
   ]
 }
 
@@ -164,7 +163,44 @@ module "Private_load_balancer" {
 
   depends_on = [
     module.public_instances,
+    module.private_instances,
     module.security_group,
-    module.route_table
+    module.route_table,
   ]
+}
+
+
+resource "null_resource" "configure_reverse_proxy" {
+  count = length(module.public_instances.public_instance_ips)
+
+  triggers = {
+    internal_lb_dns = module.Private_load_balancer.lb_dns_name
+  }
+
+  depends_on = [
+    module.Public_load_balancer,
+    module.Private_load_balancer,
+    module.public_instances
+  ]
+
+  provisioner "remote-exec" {
+    connection {
+      type        = "ssh"
+      user        = "ubuntu"
+      private_key = file(var.key_pair_name)
+      host        = module.public_instances.public_instance_ips[count.index]
+    }
+    inline = [
+      "sudo bash -c 'cat <<EOF > /etc/apache2/sites-available/000-default.conf\n<VirtualHost *:80>\n  ProxyPreserveHost On\n  ProxyPass / http://${module.Private_load_balancer.lb_dns_name}/\n  ProxyPassReverse / http://${module.Private_load_balancer.lb_dns_name}/\n</VirtualHost>\nEOF'",
+      "sudo systemctl restart apache2"
+    ]
+  }
+}
+
+module "print_ips" {
+  source       = "./modules/print_ips"
+  instance_ips = module.public_instances.public_instance_ips
+  lb_dns       = module.Public_load_balancer.lb_dns_name
+  output_file  = "all-ips.txt"
+  depends_on   = [module.public_instances, module.load_balancer]
 }

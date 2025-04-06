@@ -1,4 +1,3 @@
-# Load Balancer Security Group
 resource "aws_security_group" "load_balancer_sg" {
   name   = "${var.resource_name}-lb-sg"
   vpc_id = var.vpc_id
@@ -7,7 +6,7 @@ resource "aws_security_group" "load_balancer_sg" {
     from_port   = 80
     to_port     = 80
     protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]  # Allow HTTP from anywhere
+    cidr_blocks = ["0.0.0.0/0"]  
   }
 
   egress {
@@ -22,7 +21,6 @@ resource "aws_security_group" "load_balancer_sg" {
   }
 }
 
-# Private Instance Security Group
 resource "aws_security_group" "private_instance_sg" {
   name   = "${var.resource_name}-private-sg"
   vpc_id = var.vpc_id
@@ -56,6 +54,13 @@ resource "aws_security_group" "private_instance_sg" {
 resource "aws_security_group" "bastion_sg" {
   name   = "${var.resource_name}-bastion-sg"
   vpc_id = var.vpc_id
+   
+   ingress {
+    from_port   = 80
+    to_port     = 80
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]  
+  }
 
   ingress {
     from_port   = 22

@@ -26,8 +26,7 @@ subnet_configs = {
 
 #ami_id        = module.data_source.ami_id # Replace with your actual AMI ID
 instance_type = "t2.micro"
-key_name      = "my-key-pair" # Replace with your actual key name
-
+key_name      = "my-key-pair"
 bastion_instance_count = 2
 private_instance_count = 2
 /*
@@ -42,8 +41,8 @@ user_data = <<-EOF
             EOF
 */
 nat_gateway_name       = "EsmaelTerraform-nat-gw"
-public_subnet_id_input = module.subnet.public_subnets[0] # Ensure this is correctly output from subnet module
-key_pair_name          = "my-key-pair"
+#public_subnet_id_input = module.subnet.public_subnets[0]
+key_pair_name          = "my-key-pair.pem"
 encryption_algorithm   = "RSA"
 encryption_key_bits    = 4096
 

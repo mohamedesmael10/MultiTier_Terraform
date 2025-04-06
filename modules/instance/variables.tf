@@ -73,3 +73,13 @@ variable "bastion_host_ip" {
   type        = string
   default     = ""  # This must be provided when private_instance_count > 0
 }
+
+/*
+variable "internal_lb_dns" {
+  description = "DNS name of the internal load balancer"
+  type        = string
+  default     = ""  
+
+}
+
+*/
