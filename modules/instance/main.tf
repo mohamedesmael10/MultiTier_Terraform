@@ -27,6 +27,11 @@ resource "aws_instance" "private" {
   }
 }
 
+resource "time_sleep" "wait_for_instance" {
+create_duration = "60s"
+depends_on = [aws_instance.private, aws_instance.bastion]
+
+}
 
 resource "null_resource" "bastion_provisioners" {
   count = var.bastion_instance_count > 0 ? var.bastion_instance_count : 0
@@ -92,12 +97,9 @@ resource "null_resource" "private_provisioners" {
     }
     inline = [
     "set -e", 
-    "echo 'Updating apt-get...'",
     "sudo apt-get update -y",
-    "sudo apt-get install -f -y",
-    "echo 'Installing apache2...'",
-    "sudo apt-get install -y apache2",
-    "echo 'Starting apache2...'",
+    "sudo apt-get update --fix-missing -y",
+    "sudo apt-get install -y -f apache2",
     "sudo systemctl start apache2",
     "sudo systemctl enable apache2",
     "sudo mkdir -p /var/www/html",

@@ -70,7 +70,7 @@ module "public_instances" {
   #user_data              = var.user_data
   ami_id         = module.data_source.ami_id
   instance_type  = var.instance_type
-  subnet_ids     = module.subnet.public_subnets # Change this line
+  subnet_ids     = module.subnet.public_subnets 
   subnet_configs = var.subnet_configs
   security_group_ids = {
     bastion       = module.security_group.bastion_security_group_id
@@ -79,7 +79,6 @@ module "public_instances" {
   }
   key_name        = var.key_pair_name
   bastion_host_ip = ""
-  # Ensure public instances are created after the subnets, security groups, and route table
   depends_on = [
     module.subnet,
     module.security_group,
@@ -102,7 +101,7 @@ module "private_instances" {
   bastion_instance_count = 0
   ami_id         = module.data_source.ami_id
   instance_type  = var.instance_type
-  subnet_ids     = module.subnet.private_subnets # Change this line
+  subnet_ids     = module.subnet.private_subnets 
   subnet_configs = var.subnet_configs
   security_group_ids = {
     bastion       = module.security_group.bastion_security_group_id
@@ -112,7 +111,6 @@ module "private_instances" {
   key_name = var.key_pair_name
   #user_data                  = var.user_data
   bastion_host_ip = module.public_instances.public_instance_ips[0]
-  # Ensure private instances are created after the subnets, security groups, NAT gateway, and route table
   depends_on = [
     module.subnet,
     module.public_instances,
@@ -202,5 +200,5 @@ module "print_ips" {
   instance_ips = module.public_instances.public_instance_ips
   lb_dns       = module.Public_load_balancer.lb_dns_name
   output_file  = "all-ips.txt"
-  depends_on   = [module.public_instances, module.load_balancer]
+  depends_on   = [module.public_instances, module.Public_load_balancer]
 }
