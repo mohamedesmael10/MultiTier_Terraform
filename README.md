@@ -1,6 +1,12 @@
 
 # Project: Multi-Tier Private Cloud with Bastion Host and Load Balancer
 
+## Architecture Diagram
+
+![Architecture Diagram](https://github.com/mohamedesmael10/MultiTier_Terraform/blob/main/Screenshots/3.png)
+
+*The diagram represents the VPC with public and private subnets, NAT Gateway, Bastion Host, Load Balancers, and EC2 instances.*
+
 ## Overview
 
 This project establishes a secure and scalable cloud infrastructure on AWS using Terraform. It provisions a Virtual Private Cloud (VPC) with both public and private subnets and deploys essential components such as EC2 instances, a NAT Gateway, a Bastion Host, and Load Balancers to ensure high availability and fault tolerance.
@@ -43,12 +49,6 @@ This project establishes a secure and scalable cloud infrastructure on AWS using
 
 11. **Print IPs Module**
     - Uses remote provisioners to configure instances and a local-exec provisioner to print all IPs and the load balancer's DNS to a file (`all-ips.txt`).
-
-## Architecture Diagram
-
-![Architecture Diagram](https://github.com/mohamedesmael10/MultiTier_Terraform/blob/main/Screenshots/3.png)
-
-*The diagram represents the VPC with public and private subnets, NAT Gateway, Bastion Host, Load Balancers, and EC2 instances.*
 
 ## How to Connect
 
@@ -195,3 +195,4 @@ Follow best practices for security, remote state management, and modular code or
 - **Mohamed Mostafa Esmael**  
   Email: [mohamed.mostafa.esmael10@outlook.com](mailto:mohamed.mostafa.esmael10@outlook.com)  
   LinkedIn: [linkedin.com/in/mohamedesmael](https://linkedin.com/in/mohamedesmael)
+
